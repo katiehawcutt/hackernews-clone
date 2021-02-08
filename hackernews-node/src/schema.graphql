@@ -1,0 +1,80 @@
+# Defining the GraphQL schema
+
+type Query {
+  info: String!
+
+  # filtering, pagination & soting (filter, skip, take, orderBy)
+  feed(filter: String, skip: Int, take: Int, orderBy: LinkOrderByInput): Feed!
+
+  # Fetch a single link by its ID
+  # link(id: ID!): Link
+}
+
+type Feed {
+  id: ID!
+  links: [Link!]!
+  count: Int!
+}
+
+type Mutation {
+  # create a new link
+  post(url: String!, description: String!): Link!
+
+  # Update a link
+  # updateLink(id: ID!, url: String, description: String): Link
+
+  # Delete a link
+  # deleteLink(id: ID!): Link
+
+  signup(email: String!, password: String!, name: String!): AuthPayload
+  login(email: String!, password: String!): AuthPayload
+  vote(linkId: ID!): Vote
+}
+
+type Subscription {
+  newLink: Link
+  newVote: Vote
+}
+
+type AuthPayload {
+  token: String
+  user: User
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  links: [Link!]!
+}
+
+type Link {
+  id: ID!
+  description: String!
+  url: String!
+  postedBy: User
+  votes: [Vote!]!
+  createdAt: DateTime!
+}
+
+type Vote {
+  id: ID!
+  link: Link!
+  user: User!
+}
+
+#Sorting
+#With Prisma, it is possible to return lists of elements that are sorted (ordered) according to specific criteria. For example, you can order the list of Links alphabetically by their url or description. For the Hacker News API, you’ll leave it up to the client to decide how exactly it should be sorted and thus include all the ordering options from the Prisma API in the API of your GraphQL server. You can do so by creating an input type and an enum to represent the ordering options.
+
+input LinkOrderByInput {
+  description: Sort
+  url: Sort
+  createdAt: Sort
+}
+
+enum Sort {
+  asc
+  desc
+}
+
+scalar DateTime
